@@ -59,7 +59,7 @@ def parse_feed(name: str, feed_url: str) -> tuple[Podcast, list[Episode]]:
             image_link=image_link,
             audio_link=audio_link,
             published_date=published_date,
-            podcast_id=podcast_id
+            podcast_id=podcast_id,
         )
 
         episodes.append(episode)

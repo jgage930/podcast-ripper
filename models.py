@@ -10,6 +10,7 @@ class Episode(BaseModel):
     audio_link: str
     published_date: str
     podcast_id: str
+    downloaded: bool = False
 
 
 class Podcast(BaseModel):

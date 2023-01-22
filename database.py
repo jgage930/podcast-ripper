@@ -1,4 +1,5 @@
 from tinydb import TinyDB, Query
+
 from models import Podcast, Episode
 
 
@@ -28,3 +29,10 @@ def get_podcast(db: TinyDB, podcast_id: str) -> Podcast:
     result = db.search(podcast.id == podcast_id)[0]
 
     return Podcast(**result)
+
+
+def get_episodes(db: TinyDB, episode_id: str) -> Episode:
+    episode = Query()
+    result = db.search(episode.id == episode_id)[0]
+
+    return Episode(**result)
