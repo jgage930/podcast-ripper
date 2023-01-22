@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 
-from helpers import parse_feed
+from helpers import parse_feed, download_episode
 from database import (
     get_connection,
     insert_episode,
@@ -55,3 +55,13 @@ def get_episode_by_id(episode_id: str):
 @app.get("/episodes")
 def get_all_episodes():
     return episodes_db.all()
+
+
+@app.post("/download/episode/{episode_id}")
+def download_episode_by_id(episode_id: str):
+    try:
+        download_episode(episodes_db, episode_id)
+    except Exception as e:
+        return {'msg': f"Could not download podcast.  {e}"}
+
+    return {'msg': f"Downloaded {episode_id}"}

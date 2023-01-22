@@ -3,5 +3,5 @@ scratch.py
 __pycache__
 db.json
 podcasts/
-podcast.json
+podcasts.json
 episodes.json

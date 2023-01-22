@@ -3,9 +3,11 @@ import os
 import os.path
 from datetime import datetime
 from models import Podcast, Episode
+from database import get_episode, update_downloaded
 import requests
 import uuid
 from typing import Any, Union
+from tinydb import TinyDB
 
 
 def to_datetime(date_str: str) -> datetime:
@@ -85,20 +87,16 @@ def to_snake_case(text: str) -> str:
     return lower.replace(" ", "_")
 
 
-def download_episodes(podcast: Podcast) -> str:
-    # downloads episodes to a folder named the podcast title
-    directory = "podcasts"
-    folders = [dir_name for dir_name in os.listdir(
-        directory) if os.path.isdir(f"podcasts/{dir_name}")]
+def download_episode(episode_db: TinyDB, episode_id: str):
+    # download an episode based on episode_id
+    episode: Episode = get_episode(episode_db, episode_id)
 
-    if podcast.title not in folders:
-        os.mkdir(f"podcasts/{podcast.title}")
+    link = episode.audio_link
+    id = episode.id
+    response = requests.get(link)
 
-    episodes_directory = f"podcasts/{podcast.title}"
-    os.chdir(episodes_directory)
+    os.chdir("podcasts")
+    with open(f"{id}.mp3", "wb") as audio_file:
+        audio_file.write(response.content)
 
-    for episode in podcast.episodes:
-        response = requests.get(episode.audio_link)
-        episode_name = to_snake_case(episode.title)
-        with open(f"{episode_name}.mp3", 'wb') as file:
-            file.write(response.content)
+    update_downloaded(episode_db, episode_id, True)

@@ -50,3 +50,8 @@ def delete_db_files():
         os.remove("episodes.json")
     except OSError as error:
         print(error)
+
+
+def update_downloaded(db: TinyDB, episode_id: str, downloaded: bool):
+    episode = Query()
+    db.update({'downloaded': downloaded}, episode.id == episode_id)
