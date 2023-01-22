@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi.responses import FileResponse
 
 from helpers import parse_feed, download_episode
 from database import (
@@ -8,6 +9,8 @@ from database import (
     get_podcast,
     get_episode,
 )
+
+import os
 
 
 app = FastAPI()
@@ -65,3 +68,14 @@ def download_episode_by_id(episode_id: str):
         return {'msg': f"Could not download podcast.  {e}"}
 
     return {'msg': f"Downloaded {episode_id}"}
+
+
+@app.get("/file/{episode_id}")
+def get_episode_file(episode_id: str):
+    downloaded_episodes = os.listdir("podcasts/")
+    file_name = f"{episode_id}.mp3"
+
+    if file_name in downloaded_episodes:
+        return FileResponse(f"podcasts/{file_name}")
+
+    return {'msg': "episode not downloaded"}
