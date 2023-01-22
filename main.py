@@ -1,7 +1,8 @@
 from fastapi import FastAPI
 
 from helpers import parse_feed
-from database import get_connection, insert_episode, insert_podcast
+from database import get_connection, insert_episode, insert_podcast, get_podcast
+
 
 app = FastAPI()
 
@@ -27,6 +28,8 @@ def add_podcast(name: str, feed_url: str):
     return podcast
 
 
-@app.get("/podcast/{name}")
-def read_podcast(name: str):
-    pass
+@app.get("/podcast/{podcast_id}")
+def read_podcasts(podcast_id: str):
+    """Return a single podcast with given id"""
+    podcast = get_podcast(podcasts_db, podcast_id)
+    return podcast

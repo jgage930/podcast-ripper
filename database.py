@@ -1,4 +1,4 @@
-from tinydb import TinyDB
+from tinydb import TinyDB, Query
 from models import Podcast, Episode
 
 
@@ -21,3 +21,10 @@ def insert_podcast(db: TinyDB, podcast: Podcast):
 
 def insert_episode(db: TinyDB, episode: Episode):
     db.insert(episode.dict())
+
+
+def get_podcast(db: TinyDB, podcast_id: str) -> Podcast:
+    podcast = Query()
+    result = db.search(podcast.id == podcast_id)[0]
+
+    return Podcast(**result)
