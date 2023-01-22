@@ -5,7 +5,8 @@ from database import (
     get_connection,
     insert_episode,
     insert_podcast,
-    get_podcast
+    get_podcast,
+    get_episode,
 )
 
 
@@ -34,17 +35,23 @@ def add_podcast(name: str, feed_url: str):
 
 
 @app.get("/podcast/{podcast_id}")
-def read_podcast(podcast_id: str):
+def get_podcast_by_id(podcast_id: str):
     """Return a single podcast with given id"""
     podcast = get_podcast(podcasts_db, podcast_id)
     return podcast
 
 
 @app.get("/podcasts")
-def read_all_podcasts():
+def get_all_podcasts():
     return podcasts_db.all()
 
 
+@app.get("/episode/{episode_id}")
+def get_episode_by_id(episode_id: str):
+    episode = get_episode(episodes_db, episode_id)
+    return episode
+
+
 @app.get("/episodes")
-def read_all_episodes():
+def get_all_episodes():
     return episodes_db.all()

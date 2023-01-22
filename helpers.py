@@ -5,6 +5,7 @@ from datetime import datetime
 from models import Podcast, Episode
 import requests
 import uuid
+from typing import Any, Union
 
 
 def to_datetime(date_str: str) -> datetime:
@@ -23,6 +24,18 @@ def to_datetime(date_str: str) -> datetime:
     )
 
 
+def parse_audio_link(entry: dict[str: Any]) -> Union[str, None]:
+    audio_link = None
+
+    links: list[dict] = entry.get("links")
+
+    for link in links:
+        if "audio" in link.get("type"):
+            audio_link = link.get("href")
+
+    return audio_link
+
+
 def parse_feed(name: str, feed_url: str) -> tuple[Podcast, list[Episode]]:
     # parse feed into objects
     episodes: list[Episode] = []
@@ -38,25 +51,14 @@ def parse_feed(name: str, feed_url: str) -> tuple[Podcast, list[Episode]]:
         title = entry.get("title")
         summary = entry.get("summary")
         author = entry.get("author")
-
         published_date = entry.get("published")
-
-        media_content = entry.get("media_content")
-        image_link = ""
-        audio_link = ""
-        for content in media_content:
-            if content.get('type') == "audio/mpeg":
-                audio_link = content.get('url')
-
-            if content.get('type') == "image/jpeg":
-                image_link = content.get('url')
+        audio_link = parse_audio_link(entry)
 
         episode = Episode(
             id=str(uuid.uuid4()),
             title=title,
             summary=summary,
             author=author,
-            image_link=image_link,
             audio_link=audio_link,
             published_date=published_date,
             podcast_id=podcast_id,

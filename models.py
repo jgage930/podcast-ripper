@@ -6,7 +6,6 @@ class Episode(BaseModel):
     title: str
     summary: str
     author: str
-    image_link: str
     audio_link: str
     published_date: str
     podcast_id: str

@@ -1,5 +1,7 @@
 from tinydb import TinyDB, Query
 
+import os
+
 from models import Podcast, Episode
 
 
@@ -31,8 +33,20 @@ def get_podcast(db: TinyDB, podcast_id: str) -> Podcast:
     return Podcast(**result)
 
 
-def get_episodes(db: TinyDB, episode_id: str) -> Episode:
+def get_episode(db: TinyDB, episode_id: str) -> Episode:
     episode = Query()
     result = db.search(episode.id == episode_id)[0]
 
     return Episode(**result)
+
+
+def delete_db_files():
+    try:
+        os.remove("podcasts.json")
+    except OSError as error:
+        print(error)
+
+    try:
+        os.remove("episodes.json")
+    except OSError as error:
+        print(error)
