@@ -1,25 +1,29 @@
 from fastapi import FastAPI
-from tinydb import TinyDB
 
 from helpers import parse_feed
+from database import get_connection, insert_episode, insert_podcast
 
 app = FastAPI()
 
 
 @app.on_event("startup")
 def startup_system():
-    global db
-    db = TinyDB('db.json')
+    global podcasts_db
+    global episode_db
+
+    podcasts_db = get_connection("podcasts")
+    episode_db = get_connection("episodes")
 
 
 @app.post("/podcast/")
 def add_podcast(name: str, feed_url: str):
-    # 1.  Parse feed in to objects
-    # 2.  Download all podcasts episodes into a folder
-    podcast = parse_feed(name, feed_url)
+    podcast, episodes = parse_feed(name, feed_url)
 
-    # convert to json and add to db
-    db.insert(podcast.dict())
+    insert_podcast(podcasts_db, podcast)
+
+    for episode in episodes:
+        insert_episode(episode_db, episode)
+
     return podcast
 
 

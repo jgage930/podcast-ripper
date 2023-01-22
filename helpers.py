@@ -1,14 +1,10 @@
 import feedparser
-import json
 import os
 import os.path
 from datetime import datetime
 from models import Podcast, Episode
 import requests
-
-
-URL = "https://www.omnycontent.com/d/playlist/e73c998e-6e60-432f-8610-ae210140c5b1/2e30b0a3-77f4-4095-ba11-ae320005b9b3/9b0ab500-dfba-4a39-b27f-ae320005b9bd/podcast.rss"
-feed = feedparser.parse(URL)
+import uuid
 
 
 def to_datetime(date_str: str) -> datetime:
@@ -27,7 +23,7 @@ def to_datetime(date_str: str) -> datetime:
     )
 
 
-def parse_feed(name: str, feed_url: str) -> Podcast:
+def parse_feed(name: str, feed_url: str) -> tuple[Podcast, list[Episode]]:
     # parse feed into objects
     episodes: list[Episode] = []
 
@@ -35,9 +31,9 @@ def parse_feed(name: str, feed_url: str) -> Podcast:
 
     entries = feed['entries']
 
-    print(json.dumps(entries[0], indent=4))
+    podcast_id = str(uuid.uuid4())
+
     for entry in entries:
-        print(entry.get("published") + '\n')
 
         title = entry.get("title")
         summary = entry.get("summary")
@@ -56,12 +52,14 @@ def parse_feed(name: str, feed_url: str) -> Podcast:
                 image_link = content.get('url')
 
         episode = Episode(
+            id=str(uuid.uuid4()),
             title=title,
             summary=summary,
             author=author,
             image_link=image_link,
             audio_link=audio_link,
-            published_date=published_date
+            published_date=published_date,
+            podcast_id=podcast_id
         )
 
         episodes.append(episode)
@@ -69,12 +67,15 @@ def parse_feed(name: str, feed_url: str) -> Podcast:
     now = datetime.now()
     now_str = now.strftime("%m-%d-%Y %H:%M:%S")
 
-    return Podcast(
+    podcast = Podcast(
+        id=podcast_id,
         title=name,
         feed_url=feed_url,
         episodes=episodes,
         last_updated=now_str
     )
+
+    return podcast, episodes
 
 
 def to_snake_case(text: str) -> str:
